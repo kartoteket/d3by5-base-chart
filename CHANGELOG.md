@@ -10,6 +10,8 @@ This project adheres (well, maybe not quite) to [Semantic Versioning](http://sem
 - Added README with initial API definition
 - Added base class 'index.js' with the first raw object
 
+### Changed
+- Renamed index.js to d3by5-base-graphs
 
 [//]: ##############################################
 <!---
