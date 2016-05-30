@@ -1,0 +1,27 @@
+{
+  "name": "d3by5-base-chart",
+  "version": "0.0.1",
+  "description": "The base class for all the d3by5 charts",
+  "main": "d3by5-base-chart.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kartoteket/d3by5-base-chart.git"
+  },
+  "keywords": [
+    "d3",
+    "charts",
+    "graphs",
+    "visualisation",
+    "bas",
+    "class"
+  ],
+  "author": "Bård Ingebricson Røtzer, Svale Andreas Fossåskaret",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kartoteket/d3by5-base-chart/issues"
+  },
+  "homepage": "https://github.com/kartoteket/d3by5-base-chart#readme"
+}
