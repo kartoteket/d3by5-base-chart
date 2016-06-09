@@ -87,7 +87,47 @@ if (typeof module === 'object' && typeof module.exports === 'object') {
       }
       return this;
     };
+    /**
+     * Sets the marging of a chart, this can be a single value or an object/array
+     * @param  {Mixed} value - the data used to draw the chart
+     *                           Array - [x,x,x,x] where x is a number, corresponding to a position, exactly 4 elements
+     *                           Number - a single number
+     *                           Object - a valid margins object {top, right, bottom, left}
+     *
+     * @return {Mixed}       - the margin object or chart
+     */
+     base.margin =  function (value) {
+      if (!arguments.length) return this.options.margin;
 
+      /// single number passed
+      if (_.isNumber(value)) {
+        this.options.margin = {
+                                top: value,
+                                right: value,
+                                bottom: value,
+                                left: value
+                              };
+      }
+      // array with 4 elements [1,2,3,4]
+      else if (_.isArray(value) && value.length === 4) {
+        this.options.margin = {
+                                top: value[0],
+                                right: value[1],
+                                bottom: value[2],
+                                left: value[3]
+                              };
+      }
+      // valid margins object
+      else if (_.isObject(value) &&
+                _.has(value, 'top') &&
+                _.has(value, 'right') &&
+                _.has(value, 'bottom') &&
+                _.has(value, 'left')
+                ) {
+        this.options.margin = value;
+      }
+      return this;
+    };
     /**
      * Sets a listener on the clices of the chart
      * @param  {String} action    - the type of action to listen to ( ie. 'click', 'mouseover')
