@@ -27,11 +27,9 @@
   "bugs": {
     "url": "https://github.com/kartoteket/d3by5-base-chart/issues"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "homepage": "https://github.com/kartoteket/d3by5-base-chart#readme",
   "dependencies": {
-    "d3": "^3.5.17"
+    "d3": "^3.5.17",
+    "underscore": "^1.8.3"
   }
 }
