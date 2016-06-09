@@ -30,7 +30,8 @@ if (typeof module === 'object' && typeof module.exports === 'object') {
  * 		calling with a value will set the value on the target and return the target object (the chart that implements it)
  */
 
-
+    base.DATATYPE_UNIDIMENSIONAL = "unidimensional";
+    base.DATATYPE_MULTIDIMENSIONAL = "multidimensional";
 
     /**
      * Sets the chart-padding
@@ -102,34 +103,86 @@ if (typeof module === 'object' && typeof module.exports === 'object') {
     /**
      * Utility that updates the data by adding colors and a unique id
      * @param  {Array} inData - an array of objects
-     * @return {Array}        - an array sanitized to ensure the props color and id is present
+     *                          data can have two distinct layouts
+     *                          unidimensional:
+     *                            [{label, values},{labels, values}]
+     *                          multidimensionsal: (key is a definition, label, for the values)
+     *                            [
+     *                              {label, key, values: [value, value, value]},
+     *                              {label, key, values: [value, value, value]},
+     *                              }
+     *                            ]
+     *                           or: (no key treat the data as a series of numbers)
+     *                            [
+     *                              {label, values: [value, value, value]},
+     *                              {label, values: [value, value, value]},
+     *                              }
+     *                            ]
+     * @return {Array}        - an array sanitized to ensure the props label, values, color and id is present
      */
     base._parseData = function (inData) {
-      var color
+      var color = this._getColorAccessor(inData);
+
+      return this._mapData(inData, color);
+
+    };
+
+    base._mapData = function (inData, colorAccessor) {
+      var idPrefix = this.options.idPrefix || 'id-'
         , that = this
       ;
-      // if there are no fillcolors set, create a range
-      if (!this.options.fillColor) {
-        color = d3.scale.linear()
-                  .domain([1,inData.length])
-                  .interpolate(d3.interpolateHcl)
-                  .range([d3.rgb("#007AFF"), d3.rgb('#FFF500')]); // make this in line with the color we came from
-      }
-      // the fillcolors are a range, and it can matches the number of items
-      else if (_.isArray(this.options.fillColor) && this.options.fillColor.length < inData.length) {
-        color = this.options.fillColor;
-      }
-      // fillColor is a single color
-      // create an array of fillcolors for the accessor function
-      else {
-        color = function (x) {return that.options.fillColor;};
-      }
+
+      // set the type of indata
+      this.options.dataType = this.DATATYPE_UNIDIMENSIONAL;
+
       // apply a color to all the datanodes
       data = inData.map(function (d, i) {
-        d.color = d.color || color(i);
-        d.id    = d.id || _.uniqueId('bar-');
+        var _outObject
+        ;
+        if (_.isArray(d.values)) {
+          that.options.dataType = that.DATATYPE_MULTIDIMENSIONAL;
+          d.values = d.values.map(function(value, index) {
+                      _outObject = {
+                                    label:d.keys[index],
+                                    values: value,
+                                    color: colorAccessor(index),
+                                    id: _.uniqueId(idPrefix+i+'-')
+                                  };
+                      return _outObject;
+                    });
+        }
+        d.color = d.color || colorAccessor(i);
+        d.id    = d.id || _.uniqueId(idPrefix);
         return d;
       });
 
       return data;
+    };
+
+    /**
+     * Returns an accessor function for retrieving the color based on the index of the data-node
+     * @return {[type]} [description]
+     */
+    base._getColorAccessor = function (inData) {
+      var that = this;
+            // if there are no fillcolors set, create a range
+      if (!this.options.fillColor) {
+        return d3.scale.linear()
+                  .domain([1,inData.length])
+                  .interpolate(d3.interpolateHcl)
+                  .range([d3.rgb("#007AFF"), d3.rgb('#FFF500')]); // make this in line with the color we came from
+      }
+
+      // the fillcolors are a range, and it can match the number of items
+      if (_.isArray(this.options.fillColor) && this.options.fillColor.length < inData.length) {
+        return function (i) {
+          return that.options.fillColor[i];
+        };
+      }
+
+      // fillColor is a single color
+      // create an accessor function
+
+      return function (x) {return that.options.fillColor;};
+
     };
