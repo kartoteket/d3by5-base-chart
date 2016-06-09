@@ -4,11 +4,13 @@ var base = {};
 // define d3by5-base-chart for Node module pattern loaders, including Browserify
 if (typeof module === 'object' && typeof module.exports === 'object') {
   var d3 = require('d3');
+  var _ = require('underscore');
   module.exports = base;
 
 // define d3by5_PieChart as an AMD module
 } else if (typeof define === 'function' && define.amd) {
   var d3 = require('d3');
+  var _ = require('underscore');
   define(base);
 
 // define the base in a global namespace d3By5
@@ -78,7 +80,7 @@ if (typeof module === 'object' && typeof module.exports === 'object') {
      */
     base.data = function  (value) {
       if (!arguments.length) return this.options.data;
-      this.options.data = this.colorize(value);
+      this.options.data = this._parseData(value);
       if (typeof this.updateData === 'function') {
         this.updateData();
       }
@@ -97,14 +99,35 @@ if (typeof module === 'object' && typeof module.exports === 'object') {
       return this;
     };
 
-    base.colorize = function (inData) {
-      var color = d3.scale.linear()
-                    .domain([1,inData.length])
-                    .interpolate(d3.interpolateHcl)
-                    .range([d3.rgb("#007AFF"), d3.rgb('#FFF500')]); // make this in line with the color we came from
+    /**
+     * Utility that updates the data by adding colors and a unique id
+     * @param  {Array} inData - an array of objects
+     * @return {Array}        - an array sanitized to ensure the props color and id is present
+     */
+    base._parseData = function (inData) {
+      var color
+        , that = this
+      ;
+      // if there are no fillcolors set, create a range
+      if (!this.options.fillColor) {
+        color = d3.scale.linear()
+                  .domain([1,inData.length])
+                  .interpolate(d3.interpolateHcl)
+                  .range([d3.rgb("#007AFF"), d3.rgb('#FFF500')]); // make this in line with the color we came from
+      }
+      // the fillcolors are a range, and it can matches the number of items
+      else if (_.isArray(this.options.fillColor) && this.options.fillColor.length < inData.length) {
+        color = this.options.fillColor;
+      }
+      // fillColor is a single color
+      // create an array of fillcolors for the accessor function
+      else {
+        color = function (x) {return that.options.fillColor;};
+      }
       // apply a color to all the datanodes
       data = inData.map(function (d, i) {
         d.color = d.color || color(i);
+        d.id    = d.id || _.uniqueId('bar-');
         return d;
       });
 
