@@ -13,6 +13,7 @@ This project adheres (well, maybe not quite) to [Semantic Versioning](http://sem
 
 ### Changed
 - Renamed index.js to d3by5-base-graphs
+- Refactored _parseData to enable easier overwriting of parts of the properties
 
 [//]: ##############################################
 <!---
