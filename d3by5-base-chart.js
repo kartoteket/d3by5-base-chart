@@ -30,7 +30,7 @@ if (typeof module === 'object' && typeof module.exports === 'object') {
  * 		calling with a value will set the value on the target and return the target object (the chart that implements it)
  */
 
-    base.DATATYPE_LINEAR = "linear";
+    base.DATATYPE_UNIDIMENSIONAL = "unidimensional";
     base.DATATYPE_MULTIDIMENSIONAL = "multidimensional";
 
     /**
@@ -104,20 +104,21 @@ if (typeof module === 'object' && typeof module.exports === 'object') {
      * Utility that updates the data by adding colors and a unique id
      * @param  {Array} inData - an array of objects
      *                          data can have two distinct layouts
-     *                          linear:
+     *                          unidimensional:
      *                            [{label, values},{labels, values}]
-     *                          multi dimensionsal:
+     *                          multidimensionsal: (key is a definition, label, for the values)
      *                            [
-     *                              {label, valiues: [
-     *                                                {label, values},
-     *                                                {label, values}]
-     *                              },
-     *                              {label, valiues: [
-     *                                                {label, values},
-     *                                                {label, values}]
+     *                              {label, key, values: [value, value, value]},
+     *                              {label, key, values: [value, value, value]},
      *                              }
      *                            ]
-     * @return {Array}        - an array sanitized to ensure the props color and id is present
+     *                           or: (no key treat the data as a series of numbers)
+     *                            [
+     *                              {label, values: [value, value, value]},
+     *                              {label, values: [value, value, value]},
+     *                              }
+     *                            ]
+     * @return {Array}        - an array sanitized to ensure the props label, values, color and id is present
      */
     base._parseData = function (inData) {
       var color = this._getColorAccessor(inData);
@@ -132,7 +133,7 @@ if (typeof module === 'object' && typeof module.exports === 'object') {
       ;
 
       // set the type of indata
-      this.options.dataType = this.DATATYPE_LINEAR;
+      this.options.dataType = this.DATATYPE_UNIDIMENSIONAL;
 
       // apply a color to all the datanodes
       data = inData.map(function (d, i) {
