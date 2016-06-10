@@ -33,6 +33,14 @@ if (typeof module === 'object' && typeof module.exports === 'object') {
     base.DATATYPE_UNIDIMENSIONAL = "unidimensional";
     base.DATATYPE_MULTIDIMENSIONAL = "multidimensional";
 
+    base.options = {
+      margin: {
+                top: 0,
+                right: 0,
+                bottom: 0,
+                left: 0
+              }
+    };
     /**
      * Sets the chart-padding
      * @param  {Number} value - the padding of the chart
@@ -87,7 +95,62 @@ if (typeof module === 'object' && typeof module.exports === 'object') {
       }
       return this;
     };
+    /**
+     * Sets the marging of a chart, this can be a single value or an object/array
+     * @param  {Mixed} v1 - a margin fragment or complete margin object
+     *                           Number - a single number, used for margin top, or matched as below
+     *                           Object - a valid margins object {top, right, bottom, left}
+     * @param  {Number} v2 - number describing right or horizontal margin
+     * @param  {Number} v3 - number describing bottom margin
+     * @param  {Number} v4 - number describing left margin
+     *
+     * @return {Mixed}       - the margin object or chart
+     */
+     base.margin =  function (v1, v2, v3, v4) {
+      var margin;
+      // retun if getter
+      if (!arguments.length) {
+        return this.options.margin;
+      }
 
+      // valid margins object
+      if (_.isObject(v1) &&
+                _.has(v1, 'top') &&
+                _.has(v1, 'right') &&
+                _.has(v1, 'bottom') &&
+                _.has(v1, 'left')
+                ) {
+        this.options.margin = v1;
+        return this;
+      }
+
+      if (!_.isNumber(v1)) {
+        console.error('Could not match ', arguments ,' to any valid margin');
+        return this;
+      }
+
+      //
+      // Arguments are any combination of numbers
+      //
+      if (arguments.length === 1) {
+        margin = [v1, v1, v1, v1];
+      }
+
+      else if (arguments.length === 2) {
+        margin = [v1, v2, v1, v2];
+      }
+
+      else if (arguments.length === 3) {
+        margin = [v1, v2, v3, v2];
+      }
+
+      else if (arguments.length === 4) {
+        margin = [v1, v2, v3, v4];
+      }
+
+      this.options.margin = _.object(['top','right','bottom','left'], margin);
+      return this;
+    };
     /**
      * Sets a listener on the clices of the chart
      * @param  {String} action    - the type of action to listen to ( ie. 'click', 'mouseover')
