@@ -7,8 +7,7 @@ The base class for all d3by5 charts. This base implements the shared functionali
 * **data**   - the data that produces the chart (optional, but no chart without it)
 * **margin**
     will set margins on the chart, the input data can be
-    * **Number** - (any valid Number)
-    * **Array**  - an array of numbers, exactly 4 elements, 0 - top, 1 - right, 2 - bottom, 3 - left
+    * **Number** - Any valid number following css standard settings, can be 1, 2, 3 or 4 numbers separated by ,
     * **Object** - {top, right, bottom, left}
 
 ## Usage
