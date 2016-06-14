@@ -20,6 +20,8 @@ All methods operate as getters/setters. Providing a value will set it and return
 
 ## Utilities
 * **remove** - removes the chart from stage
+* **getCalculatedHeight** returns the height without margin top and bottom
+* **getCalculatedWidth** returns the width without margin left and right
 * **_createMargins** - used by **margin** to create valid object (top, left, bottom, right)
 * **_parseData** - entry point for dataparsing, used by **data** and implements **_getColorAccessor**,  **_mapData** and **_getDataDimensions**
 * **_mapData** - dafault mapping of data to valid format

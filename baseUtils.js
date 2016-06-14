@@ -33,6 +33,36 @@ baseUtils.remove = function () {
   }
 };
 
+
+/**
+ * returns the width calculated and adjusted for margins
+ * @return {Number} - The width - margins
+ */
+baseUtils.getCalculatedWidth = function () {
+  return this.options.width - this.options.margin.left - this.options.margin.right;
+};
+
+/**
+ * returns the height calculated and adjusted for margins
+ * @return {Number} - The height - margins
+ */
+baseUtils.getCalculatedHeight = function () {
+  return this.options.height - this.options.margin.top - this.options.margin.bottom;
+};
+
+
+/**
+ * Created the margins based on the input from base.margin()
+ *
+ * @param  {Mixed} v1  - a margin fragment or complete margin object
+     *                             Number - a single number, used for margin top, or matched as below
+     *                             Object - a valid margins object {top, right, bottom, left}
+ * @param  {Number} v2 - number describing right or horizontal margin
+ * @param  {Number} v3 - number describing bottom margin
+ * @param  {Number} v4 - number describing left margin
+ *
+ * @return {[type]}    [description]
+ */
 baseUtils._createMargins = function (v1, v2, v3, v4) {
   var margin;
     // valid margins object
