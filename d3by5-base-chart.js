@@ -3,14 +3,19 @@
 var base = {};
 // define d3by5-base-chart for Node module pattern loaders, including Browserify
 if (typeof module === 'object' && typeof module.exports === 'object') {
-  var d3 = require('d3');
-  var _ = require('underscore');
+  var d3 = require('d3')
+    , _ = require('underscore')
+    , baseUtils = require('./baseUtils')
+  ;
+
   module.exports = base;
 
 // define d3by5_PieChart as an AMD module
 } else if (typeof define === 'function' && define.amd) {
-  var d3 = require('d3');
-  var _ = require('underscore');
+  var d3 = require('d3')
+    , _ = require('underscore')
+    , baseUtils = require('./baseUtils')
+  ;
   define(base);
 
 // define the base in a global namespace d3By5
@@ -41,6 +46,7 @@ if (typeof module === 'object' && typeof module.exports === 'object') {
                 left: 0
               }
     };
+
     /**
      * Sets the chart-padding
      * @param  {Number} value - the padding of the chart
@@ -97,60 +103,21 @@ if (typeof module === 'object' && typeof module.exports === 'object') {
     };
     /**
      * Sets the marging of a chart, this can be a single value or an object/array
-     * @param  {Mixed} v1 - a margin fragment or complete margin object
-     *                           Number - a single number, used for margin top, or matched as below
-     *                           Object - a valid margins object {top, right, bottom, left}
-     * @param  {Number} v2 - number describing right or horizontal margin
-     * @param  {Number} v3 - number describing bottom margin
-     * @param  {Number} v4 - number describing left margin
+     * @param  {Mixed} argument[0]  - a margin fragment or complete margin object
+         *                             Number - a single number, used for margin top, or matched as below
+         *                             Object - a valid margins object {top, right, bottom, left}
+     * @param  {Number} argument[1] - number describing right or horizontal margin
+     * @param  {Number} argument[2] - number describing bottom margin
+     * @param  {Number} argument[3] - number describing left margin
      *
      * @return {Mixed}       - the margin object or chart
      */
-     base.margin =  function (v1, v2, v3, v4) {
-      var margin;
-      // retun if getter
-      if (!arguments.length) {
-        return this.options.margin;
-      }
-
-      // valid margins object
-      if (_.isObject(v1) &&
-                _.has(v1, 'top') &&
-                _.has(v1, 'right') &&
-                _.has(v1, 'bottom') &&
-                _.has(v1, 'left')
-                ) {
-        this.options.margin = v1;
-        return this;
-      }
-
-      if (!_.isNumber(v1)) {
-        console.error('Could not match ', arguments ,' to any valid margin');
-        return this;
-      }
-
-      //
-      // Arguments are any combination of numbers
-      //
-      if (arguments.length === 1) {
-        margin = [v1, v1, v1, v1];
-      }
-
-      else if (arguments.length === 2) {
-        margin = [v1, v2, v1, v2];
-      }
-
-      else if (arguments.length === 3) {
-        margin = [v1, v2, v3, v2];
-      }
-
-      else if (arguments.length === 4) {
-        margin = [v1, v2, v3, v4];
-      }
-
-      this.options.margin = _.object(['top','right','bottom','left'], margin);
+    base.margin =  function () {
+      if (!arguments.length) return this.options.margin;
+      this.options.margin = this._createMargins.apply(this, arguments);
       return this;
     };
+
     /**
      * Sets a listener on the clices of the chart
      * @param  {String} action    - the type of action to listen to ( ie. 'click', 'mouseover')
@@ -163,89 +130,5 @@ if (typeof module === 'object' && typeof module.exports === 'object') {
       return this;
     };
 
-    /**
-     * Utility that updates the data by adding colors and a unique id
-     * @param  {Array} inData - an array of objects
-     *                          data can have two distinct layouts
-     *                          unidimensional:
-     *                            [{label, values},{labels, values}]
-     *                          multidimensionsal: (key is a definition, label, for the values)
-     *                            [
-     *                              {label, key, values: [value, value, value]},
-     *                              {label, key, values: [value, value, value]},
-     *                              }
-     *                            ]
-     *                           or: (no key treat the data as a series of numbers)
-     *                            [
-     *                              {label, values: [value, value, value]},
-     *                              {label, values: [value, value, value]},
-     *                              }
-     *                            ]
-     * @return {Array}        - an array sanitized to ensure the props label, values, color and id is present
-     */
-    base._parseData = function (inData) {
-      var color = this._getColorAccessor(inData);
-
-      return this._mapData(inData, color);
-
-    };
-
-    base._mapData = function (inData, colorAccessor) {
-      var idPrefix = this.options.idPrefix || 'id-'
-        , that = this
-      ;
-
-      // set the type of indata
-      this.options.dataType = this.DATATYPE_UNIDIMENSIONAL;
-
-      // apply a color to all the datanodes
-      data = inData.map(function (d, i) {
-        var _outObject
-        ;
-        if (_.isArray(d.values)) {
-          that.options.dataType = that.DATATYPE_MULTIDIMENSIONAL;
-          d.values = d.values.map(function(value, index) {
-                      _outObject = {
-                                    label:d.keys[index],
-                                    values: value,
-                                    color: colorAccessor(index),
-                                    id: _.uniqueId(idPrefix+i+'-')
-                                  };
-                      return _outObject;
-                    });
-        }
-        d.color = d.color || colorAccessor(i);
-        d.id    = d.id || _.uniqueId(idPrefix);
-        return d;
-      });
-
-      return data;
-    };
-
-    /**
-     * Returns an accessor function for retrieving the color based on the index of the data-node
-     * @return {[type]} [description]
-     */
-    base._getColorAccessor = function (inData) {
-      var that = this;
-            // if there are no fillcolors set, create a range
-      if (!this.options.fillColor) {
-        return d3.scale.linear()
-                  .domain([1,inData.length])
-                  .interpolate(d3.interpolateHcl)
-                  .range([d3.rgb("#007AFF"), d3.rgb('#FFF500')]); // make this in line with the color we came from
-      }
-
-      // the fillcolors are a range, and it can match the number of items
-      if (_.isArray(this.options.fillColor) && this.options.fillColor.length < inData.length) {
-        return function (i) {
-          return that.options.fillColor[i];
-        };
-      }
-
-      // fillColor is a single color
-      // create an accessor function
-
-      return function (x) {return that.options.fillColor;};
-
-    };
+    // extend base with the baseUtils
+    base = _.extend(base, baseUtils);
