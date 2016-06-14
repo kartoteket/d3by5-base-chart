@@ -12,6 +12,7 @@ This project adheres (well, maybe not quite) to [Semantic Versioning](http://sem
 - Added package.json
 - Can now add margins to a chart via setter
 - Can remove all graphs calling base.remove()
+- Can get height and width with subtracted margins
 
 ### Changed
 - Renamed index.js to d3by5-base-graphs
