@@ -44,7 +44,12 @@ if (typeof module === 'object' && typeof module.exports === 'object') {
                 right: 0,
                 bottom: 0,
                 left: 0
-              }
+              },
+      width: 640,
+      height: 400,
+      padding: 5,
+      fillColor: '',
+      idPrefix: 'id-'
     };
 
     /**

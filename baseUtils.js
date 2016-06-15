@@ -141,7 +141,7 @@ baseUtils._parseData = function (inData) {
  * @return {Array}        - an array sanitized to ensure the props label, values, color and id is present
  */
 baseUtils._mapData = function (inData, colorAccessor) {
-  var idPrefix = this.options.idPrefix || 'id-'
+  var idPrefix = this.options.idPrefix
     , that = this
   ;
 
