@@ -113,6 +113,7 @@ baseUtils._createMargins = function (v1, v2, v3, v4) {
 baseUtils._parseData = function (inData) {
   var color = this._getColorAccessor(inData);
 
+  this.options.dataSchema = this._getDataSchema(inData);
   this.options.dataType = this._getDataDimensions(inData);
 
   return this._mapData(inData, color);
@@ -223,3 +224,46 @@ baseUtils._getDataDimensions = function (inData) {
   return this.DATATYPE_UNIDIMENSIONAL;
 };
 
+
+/**
+ * GetDataSchema extracts schema from inData
+ * @param  {Array} inData - The data that was set in the chart.data() getter (base.data())
+ * @return {String}       - object with schema that describes data columns
+ */
+baseUtils._getDataSchema = function (inData) {
+  if (_.isArray(inData)) {
+    return inData[0].columns;
+  } else {
+    return inData.columns;
+  }
+};
+
+
+/**
+ * A simple first iteration type caster.
+ * @param  {object}   d   data object ({key: value})
+ * @return {object}   d   data object ({key: value})
+ */
+baseUtils._typeCast = function(d) {
+  var dateFormat
+    , formatDate
+    , schema = this.options.dataSchema;
+
+    // loop trough schema column by column
+  _.each(schema, function(column){
+
+    // set date format
+    if(column.type === 'date') {
+      dateFormat = _.find(schema, function(column){ return column.type === 'date' && column.format; }).format;
+      formatDate = d3.time.format(dateFormat);
+      d[column.label] = formatDate.parse(d[column.label]);
+    }
+
+    // force number
+    else if(column.type === 'number') {
+      d[column.label] = +d[column.label];
+    }
+  });
+
+  return d;
+};
