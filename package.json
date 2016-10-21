@@ -2,8 +2,9 @@
   "name": "d3by5-base-chart",
   "version": "0.0.1",
   "description": "The base class for all the d3by5 charts",
-  "main": "d3by5-base-chart.js",
+  "main": "src/js/base-chart.js",
   "scripts": {
+    "build": "bin/build.sh",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -31,5 +32,8 @@
   "dependencies": {
     "d3": "^3.5.17",
     "underscore": "^1.8.3"
+  },
+  "devDependencies": {
+    "browserify": "^13.0.1"
   }
 }
