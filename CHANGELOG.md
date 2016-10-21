@@ -16,11 +16,12 @@ This project adheres (well, maybe not quite) to [Semantic Versioning](http://sem
 - Added axis as a dependency
 - Added a new set of base utils
 
+
 ### Changed
-- Renamed index.js to d3by5-base-graphs
+- Moved index.js to src/js/base-chart and added UMD loading
 - Refactored _parseData to enable easier overwriting of parts of the properties
 - Refactored into baseUtils where all utilities are found
-
+- Moved baseUtils to src/js/base-chart-utils and added UMD loading
 
 [//]: ##############################################
 <!---

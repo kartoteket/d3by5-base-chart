@@ -1,44 +1,54 @@
-'use:strict';
-// var d3 = require('d3');
-var base = {};
-// define d3by5-base-chart for Node module pattern loaders, including Browserify
-if (typeof module === 'object' && typeof module.exports === 'object') {
-  var d3 = require('d3')
-    , _ = require('underscore')
-    , baseUtils = require('./baseUtils')
-  ;
-
-  module.exports = base;
-
-// define d3by5_PieChart as an AMD module
-} else if (typeof define === 'function' && define.amd) {
-  var d3 = require('d3')
-    , _ = require('underscore')
-    , baseUtils = require('./baseUtils')
-  ;
-  define(base);
-
-// define the base in a global namespace d3By5
-} else {
-  Window.d3By5 = Window.d3By5 || {};
-  Window.d3By5.base = base;
-}
-/**
- * The base chart is a simple object that contains methods that will be merged into any of the d3by5 charts
- * @type {Object}
- *       - height - setter/getter for the chart height
- *       - width  - setter/getter for the chart width
- *       - data   - setter/getter for the indata of the chart
+/*!
+ * Base charts
  *
- * Usage:
- * 		calling any of the functions without a value will return the currently set value
- * 		calling with a value will set the value on the target and return the target object (the chart that implements it)
  */
 
-    base.DATATYPE_UNIDIMENSIONAL = "unidimensional";
-    base.DATATYPE_MULTIDIMENSIONAL = "multidimensional";
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(['./base-chart-utils', './base-chart-axis'] , factory);
+    } else if (typeof module === 'object' && module.exports) {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like environments that support module.exports,
+        // like Node.
+        module.exports = factory(require('./base-chart-utils'), require('./base-chart-axis'));
+    } else {
+        // Browser globals (root is window)
+        root.returnExports = factory(root.baseChartUtils/*, root.baseChartAxis*/);
+    }
+}(this, function (utils, bc_axis) {
 
-    base.options = {
+'use:strict';
+
+/**
+ * The entrypoint
+ * @return {[type]} [description]
+ */
+function BaseChart () {
+
+
+  /**
+   * The base chart is a simple object that contains methods that will be merged into any of the d3by5 charts
+   * @type {Object}
+   *       - height - setter/getter for the chart height
+   *       - width  - setter/getter for the chart width
+   *       - data   - setter/getter for the indata of the chart
+   *       - fillColor
+   *       - padding
+   *       - margin
+   *
+   * Usage:
+   * 		calling any of the functions without a value will return the currently set value
+   * 		calling with a value will set the value on the target and return the target object (the chart that implements it)
+   */
+  var base = {
+
+
+
+    DATATYPE_UNIDIMENSIONAL: "unidimensional",
+    DATATYPE_MULTIDIMENSIONAL: "multidimensional",
+
+    options: {
       margin: {
                 top: 0,
                 right: 0,
@@ -49,63 +59,69 @@ if (typeof module === 'object' && typeof module.exports === 'object') {
       height: 400,
       padding: 5,
       fillColor: '',
-      idPrefix: 'id-'
-    };
+      idPrefix: 'id-',
+      on: []
+    },
 
     /**
      * Sets the chart-padding
      * @param  {Number} value - the padding of the chart
      * @return {Mixed}        - the value or chart
      */
-    base.fillColor =  function (value) {
+    fillColor:  function (value) {
       if (!arguments.length) return this.options.fillColor;
-      this.options.fillColor = value;
+      if (this.options.data) {
+        this.options.fillColor = this._getColorAccessor(this.options.data, value);
+      } else {
+        this.options.fillColor = value;
+      }
       return this;
-    };
+    },
+
     /**
      * Sets the chart-padding
      * @param  {Number} value - the padding of the chart
      * @return {Mixed}        - the value or chart
      */
-    base.padding = function (value) {
+    padding: function (value) {
       if (!arguments.length) return this.options.padding;
       this.options.padding = value;
       return this;
-    };
+    },
 
     /**
      * Sets the width of a chart
      * @param  {Number} value - the width of the chart
      * @return {Mixed}        - the value or this
      */
-    base.width = function (value) {
+    width: function (value) {
       if (!arguments.length) return this.options.width;
       this.options.width = value;
       return this;
-    };
+    },
     /**
      * Sets the height of a chart
      * @param  {Number} value - the height of the chart
      * @return {Mixed}        - the value or chart
      */
-    base.height = function (value) {
+    height: function (value) {
       if (!arguments.length) return this.options.height;
       this.options.height = value;
       return this;
-    };
+    },
     /**
      * Sets the data on a chart
      * @param  {Number} value - the data used to draw the chart
      * @return {Mixed}        - the value or chart
      */
-    base.data = function  (value) {
+    data: function  (value) {
       if (!arguments.length) return this.options.data;
       this.options.data = this._parseData(value);
       if (typeof this.updateData === 'function') {
         this.updateData();
       }
       return this;
-    };
+    },
     /**
      * Sets the marging of a chart, this can be a single value or an object/array
      * @param  {Mixed} argument[0]  - a margin fragment or complete margin object
@@ -117,11 +133,11 @@ if (typeof module === 'object' && typeof module.exports === 'object') {
      *
      * @return {Mixed}       - the margin object or chart
      */
-    base.margin =  function () {
+    margin:  function () {
       if (!arguments.length) return this.options.margin;
       this.options.margin = this._createMargins.apply(this, arguments);
       return this;
-    };
+    },
 
     /**
      * Sets a listener on the clices of the chart
@@ -129,11 +145,45 @@ if (typeof module === 'object' && typeof module.exports === 'object') {
      * @param  {Function} method  -  A bound method to be called when the action is invoked, passes the datum for this specific slice
      * @return {Mixed}            - the value or chart
      */
-    base.on = function (action, method) {
+    on: function (action, method) {
       if (!arguments.length) return this.options.on;
-      this.options.on = {action: action, method: method};
+      this.off(action, method);
+      this.options.on.push({action: action, method: method});
       return this;
-    };
+    },
 
-    // extend base with the baseUtils
-    base = _.extend(base, baseUtils);
+    off: function (action, method) {
+      var onIndex = []
+        , i ;
+
+      for(i = 0; i < this.options.on.length; i += 1) {
+        if (action === this.options.on[i].action) {
+          if (method) {
+            if (method === this.options.on[i],method) {
+              onIndex.push(i);
+            }
+          } else {
+            onIndex.push(i);
+          }
+        }
+      }
+      // remove all in the idexes
+      for (i = onIndex.length; i > 0; i -= 1) {
+        this.options.on.splice(i, 1);
+      }
+    },
+
+    axis: function () {
+      return bc_axis();
+    }
+
+
+
+  };
+  base = _.extend(base, utils);
+  return base;
+}
+
+
+  return BaseChart();
+}));
