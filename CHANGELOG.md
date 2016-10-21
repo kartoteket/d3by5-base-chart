@@ -14,6 +14,7 @@ This project adheres (well, maybe not quite) to [Semantic Versioning](http://sem
 - Can remove all graphs calling base.remove()
 - Can get height and width with subtracted margins
 - Added axis as a dependency
+- Added a new set of base utils
 
 ### Changed
 - Renamed index.js to d3by5-base-graphs
