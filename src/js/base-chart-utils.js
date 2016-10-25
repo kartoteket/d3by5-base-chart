@@ -75,6 +75,15 @@ function BaseUtils () {
                 _.has(v1, 'bottom') &&
                 _.has(v1, 'left')
                 ) {
+
+        // sanitice undefines. enforce number
+        v1 = {
+          'top' : v1.top || 0,
+          'right' : v1.right || 0,
+          'bottom' : v1.bottom || 0,
+          'left' : v1.left || 0,
+        };
+
         return v1;
       }
 
