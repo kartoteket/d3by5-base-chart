@@ -282,7 +282,25 @@ function BaseUtils () {
       });
 
       return d;
-    }
+    },
+
+    // wrapper for d3.format() -> https://github.com/mbostock/d3/wiki/Formatting
+    formatNumber: function(value, format) {
+      var formatter;
+
+      // so that we can use convenience aliases
+      switch(format) {
+        case 'commaSeparator':
+          format = ',';
+          break;
+        default:
+          format = format;
+      }
+
+      formatter = d3.format(format);
+      return formatter(value);
+    },
+
   };
   return utils;
 }

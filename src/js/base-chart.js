@@ -60,7 +60,9 @@ function BaseChart () {
       padding: 5,
       fillColor: '',
       idPrefix: 'id-',
-      on: []
+      on: [],
+      valuesFormat: null,
+
     },
 
     /**
@@ -175,8 +177,12 @@ function BaseChart () {
 
     axis: function () {
       return bc_axis();
-    }
+    },
 
+    // setter/getter for formating value strings
+    valuesFormat: function(value) {
+      return arguments.length ? (this.options.valuesFormat = value, this) : this.options.valuesFormat;
+    },
 
 
   };
