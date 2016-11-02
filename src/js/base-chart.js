@@ -48,6 +48,12 @@ function BaseChart () {
     DATATYPE_UNIDIMENSIONAL: "unidimensional",
     DATATYPE_MULTIDIMENSIONAL: "multidimensional",
 
+
+    LABEL_INSIDE: 'inside',
+    LABEL_OUTSIDE: 'outside',
+    LABEL_FIT: 'fit',         // TODO: Not in use ??!?
+    LABEL_NONE: 'none',
+
     options: {
       margin: {
                 top: 0,
@@ -179,10 +185,77 @@ function BaseChart () {
       return bc_axis();
     },
 
-    // setter/getter for formating value strings
-    valuesFormat: function(value) {
+    /**
+     * Turns the labels on and off by fixin them
+     * @param  {String} value - the position of labels or null (this.LABEL_INSIDE| this.LABEL_OUTSIDE | this.LABEL_FIT | this.LABEL_NONE)
+     *                          labels will be positioned separately on the
+     * @return {Mixed}        - the value or chart
+     */
+    labelPosition: function (value) {
+      if (!arguments.length) return this.options.labelPosition;
+
+      this.validateOption('labelPosition', value, [this.LABEL_INSIDE, this.LABEL_OUTSIDE, this.LABEL_FIT , this.LABEL_NONE]);
+
+      return this;
+    },
+
+    labelFormat: function (value) {
+      return arguments.length ? (this.setFormat('labelFormat', value), this) : this.options.labelFormat;
+    },
+    labelAlign: function (value) {
+      return arguments.length ? (this.validateOption('labelAlign', value, ['left', 'right', 'top', 'bottom']), this) : this.options.labelAlign;
+    },
+    labelColor: function(value) {
+      return arguments.length ? (this.options.labelColor = value, this) : this.options.labelColor;
+    },
+    valuesPosition: function(value) {
+      return arguments.length ? (this.validateOption('valuesPosition', value, ['inside', 'outside', 'fit', 'none']) , this) : this.options.valuesPosition;
+    },
+    valuesAlign: function(value) {
+      return arguments.length ? (this.validateOption('valuesAlign', value, ['left', 'right']), this) : this.options.valuesAlign;
+    },
+    valuesColor: function(value) {
+      return arguments.length ? (this.options.valuesColor = value, this) : this.options.valuesColor;
+    },
+    valuesFormat: function () {
       return arguments.length ? (this.options.valuesFormat = value, this) : this.options.valuesFormat;
     },
+
+    setFormat: function (prop, value) {
+      var formatter
+        , output
+      ;
+
+      if (value) {
+        formatter = d3.time.format(value);
+      }
+      // check it for data format
+      // if the format func returns the input, if is messed up
+      if (value && value === formatter(new Date())) {
+        this.options[prop] = null;
+      } else {
+        this.options[prop] = formatter;
+      }
+    },
+    /**
+     * TODO: IF this shit works and is useful, move to base utils or somwhere like that
+     * A validator that checks if input to option setter is valid. Aborts with console error if not
+     * @param  {string} option  the option to be set
+     * @param  {string} value   the value to be set
+     * @param  {array}  domain  options valid domain of values
+     * @return {bool}           returns true or false
+     */
+    validateOption: function(option, value, domain) {
+
+      value = String(value).toLowerCase();
+
+      if(_.contains(domain, value)) {
+        this.options[option] = value;
+        return true;
+      }
+      console.error('Error setting ' + option +': "' + value, '" is invalid. Valid input is: "' + domain.join('", "') +'"');
+      return false;
+    }
 
 
   };
