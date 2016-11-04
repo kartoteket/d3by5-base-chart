@@ -217,7 +217,7 @@ function BaseChart () {
     valuesColor: function(value) {
       return arguments.length ? (this.options.valuesColor = value, this) : this.options.valuesColor;
     },
-    valuesFormat: function () {
+    valuesFormat: function (value) {
       return arguments.length ? (this.options.valuesFormat = value, this) : this.options.valuesFormat;
     },
 
