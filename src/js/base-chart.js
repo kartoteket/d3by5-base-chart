@@ -68,6 +68,7 @@ function BaseChart () {
       idPrefix: 'id-',
       on: [],
       valuesFormat: null,
+      theme: {},
 
     },
 
@@ -144,6 +145,17 @@ function BaseChart () {
     margin:  function () {
       if (!arguments.length) return this.options.margin;
       this.options.margin = this._createMargins.apply(this, arguments);
+      return this;
+    },
+
+    /**
+     * Sets a theme if applicable, handling theis will be up to the pupporting chart
+     * @param  {Mixed} value - A theme object if supplied, if no value, the current value is supplied
+     * @return {Mixed}       - The theme object or the chart
+     */
+    theme: function (value) {
+      if (!arguments.length) return this.options.theme;
+      this.options.theme = value;
       return this;
     },
 

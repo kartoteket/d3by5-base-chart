@@ -15,6 +15,7 @@ This project adheres (well, maybe not quite) to [Semantic Versioning](http://sem
 - Can get height and width with subtracted margins
 - Added axis as a dependency
 - Added a new set of base utils
+- Added support for theming
 
 
 ### Changed
