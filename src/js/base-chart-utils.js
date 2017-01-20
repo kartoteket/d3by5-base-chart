@@ -131,6 +131,28 @@ function BaseUtils () {
 
     },
 
+    /**
+     * Performs a lazy simple lookup for events that may match a pattern (or really its a substring)
+     * @param  {Mixed}  pattern  - The pattern to look for, just a substring that may match, could be a simple, or an array of patterns
+     *                             The String 'mouse', 'Over' and 'MOusEOV' will match the event 'mouseover' and return this
+     * @return {Array}           - A unique list of matching events
+     */
+    getEventsOfType: function (pattern) {
+      var list = []
+        , that = this
+      ;
+
+      if (_.isString(pattern)) {
+        pattern = [pattern];
+      }
+      _.each(pattern, function (p) {
+        list = list.concat(_.filter(that.options.on, function (e) {
+          return e.action.indexOf(p) !== -1;
+        }));
+      });
+      return _.uniq(list);
+    },
+
 
     /**
      * Utility that updates the data by adding colors and a unique id

@@ -16,6 +16,7 @@ This project adheres (well, maybe not quite) to [Semantic Versioning](http://sem
 - Added axis as a dependency
 - Added a new set of base utils
 - Added support for theming
+- Add method for retrieving events matching a pattern
 
 
 ### Changed
