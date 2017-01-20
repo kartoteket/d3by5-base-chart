@@ -161,12 +161,13 @@ function BaseChart () {
 
     /**
      * Sets a listener on the clices of the chart
-     * @param  {String} action    - the type of action to listen to ( ie. 'click', 'mouseover')
-     * @param  {Function} method  -  A bound method to be called when the action is invoked, passes the datum for this specific slice
-     * @return {Mixed}            - the value or chart
+     * @param  {String} action    - The type of action to listen to ( ie. 'click', 'mouseover')
+     * @param  {Function} method  - A bound method to be called when the action is invoked, passes the datum for this specific slice
+     * @return {Mixed}            - The value or chart
      */
     on: function (action, method) {
-      if (!arguments.length) return this.options.on;
+      if (!arguments.length || arguments.length === 1) return this.options.on;
+      action = action.toLowerCase();
       this.off(action, method);
       this.options.on.push({action: action, method: method});
       return this;
@@ -191,6 +192,7 @@ function BaseChart () {
       for (i = onIndex.length; i > 0; i -= 1) {
         this.options.on.splice(i, 1);
       }
+      return this;
     },
 
     axis: function () {
